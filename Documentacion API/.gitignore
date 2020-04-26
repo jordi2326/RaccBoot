@@ -59,11 +59,11 @@ coverage.xml
 *.log
 
 # Sphinx documentation
-docs/_build/
+Documentacion API/docs/_build/
 
 # PyBuilder
 target/
-.idea/
+../.idea/
 
 # Sublime Text 2
 *.sublime*
