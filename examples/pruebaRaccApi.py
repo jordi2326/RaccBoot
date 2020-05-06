@@ -49,12 +49,10 @@ def start(update, context):
 def selector(update, context):
     user = update.message.from_user
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
-    update.message.reply_text(user.first_name,
-                              reply_markup=ReplyKeyboardRemove())
-    if update.message.text=='Recados' :
-        MessageHandler(Filters.text, bio)
+    update.message.reply_text('Usted ha seleccionado',reply_markup=ReplyKeyboardRemove())
+    update.message.reply_text(update.message.text)
 
-
+    return PHOTO
 
 
 def recados(update, context):
@@ -156,7 +154,9 @@ def main():
             ASISTENCIA: [ MessageHandler(Filters.regex('^(Asistencia)$'), start)],
 
 
-            RECADOS: [ MessageHandler(Filters.regex('^(Recados)$'), bio)],
+            RECADOS: [ MessageHandler(Filters.text, recados),
+                        CommandHandler('recados', recados)],
+
 
             MOVILIDAD: [ MessageHandler(Filters.regex('^(Movilidad)$'), start)],
 
