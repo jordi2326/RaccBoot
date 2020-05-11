@@ -26,8 +26,14 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-GENDER, PHOTO, LOCATION, BIO,REPARACIONES,TRAMITES,TAREASHOGAR,FAMILIAYSALUD,ASISTENCIA,RECADOS,MOVILIDAD,MASCOTAS,OCIOYVIAJE,SELECTOR,VOLVER ,SUBREPARACIONES,SUBSUBREPARACIONES,SUBSUBSUBREPARACIONES,BACK= range(19)
+GENDER, PHOTO, LOCATION, BIO,REPARACIONES,TRAMITES,TAREASHOGAR,FAMILIAYSALUD,ASISTENCIA,RECADOS,MOVILIDAD,MASCOTAS,OCIOYVIAJE,SELECTOR,VOLVER ,SUBREPARACIONES,SUBSUBREPARACIONES,SUBSUBSUBREPARACIONES,BACK,CONTINUAR,INFORMACION,INFORMACION1= range(22)
 
+selecion1=""
+selecion2=""
+selecion3=""
+selecion4=""
+email = ""
+telefono=""
 
 def start(update, context):
     reply_keyboard = [['Reparaciones', 'Tramites', 'Tareas del hogar'],['Familia y salud',
@@ -48,13 +54,13 @@ def start(update, context):
 
 def selector(update, context):
     user = update.message.from_user
-    selecion = update.message.text
+    selecion1 = update.message.text
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text('Usted ha seleccionado')
     update.message.reply_text(update.message.text)
     update.message.reply_text('Introduzca Continuar sino introduzca /volver')
 
-    if selecion == 'Reparaciones' :
+    if selecion1 == 'Reparaciones' :
         return REPARACIONES
     
     return VOLVER
@@ -77,9 +83,13 @@ def reparaciones(update, context):
 
 
 def subreparaciones(update , context):
-    update.message.reply_text(update.message.text)
-    selecion = update.message.text
-    if selecion == 'Manitas':
+    global selecion2
+    if(update.message.text != '/back'):
+        selecion2 = update.message.text
+    logger.info("Last %s", update.message.text)
+
+    update.message.reply_text(selecion2)
+    if selecion2 == 'Manitas':
         reply_keyboard = [['Reparacion en casa', 'Montaje de TV', 'Montaje de muebles','Otros']]
         update.message.reply_text(
         'Seleccione la opcion que usted quiera .'
@@ -89,9 +99,12 @@ def subreparaciones(update , context):
            
 
 def subsubrepaciones(update , context):
-    selecion = update.message.text
-    if(selecion=='Reparacion en casa'):
-         reply_keyboard = [['No estoy seguro', '2 horas', '3 horas','4 horas']]
+    global selecion3
+    if(update.message.text != '/back'):
+	    selecion3 = update.message.text
+
+    if(selecion3=='Reparacion en casa'):
+         reply_keyboard = [['2 horas', '3 horas','4 horas']]
          update.message.reply_text(
          'Seleccione la opcion que usted quiera .'
          'Envia  /cancel para dejar de hablar conmigo.\n\n',
@@ -100,12 +113,42 @@ def subsubrepaciones(update , context):
     return SUBSUBSUBREPARACIONES
                 
 def subsubsubreparaciones(update,context):
-    selecion = update.message.text
-    if(selecion=='2 horas'):
+    global selecion4
+    selecion4 = update.message.text
+    if selecion4=='2 horas' or selecion4=='3 horas':
         update.message.reply_text('Precio : 61,71')
-    update.message.reply_text( 'Para volver al menú  /volver\n\n'
-                                'Para salir pulse /cancel\n\n')
-    return VOLVER
+
+    if(selecion4=='4 horas'):
+        update.message.reply_text('Precio : 111,08')
+
+
+    update.message.reply_text( 	'Para continuar introducir Continuar o /informacion\n\n'
+				'Para volver al menú  /volver\n\n'
+                                'Para salir pulse /cancel\n\n'
+				'Para cambiar numero de horas pulse /back\n\n')
+    return CONTINUAR 
+
+
+def informacion(update,context):
+
+    update.message.reply_text( 	'Introduca email')
+    
+    return INFORMACION 
+
+def informacion2(update,context):
+    global email 
+    email = update.message.text 
+    update.message.reply_text('Introduca número de telefono')
+    return INFORMACION1
+
+
+def informacion3(update,context):
+    global telefono
+    telefono = update.message.text 
+    update.message.reply_text('Se le avisara en un máximo de 48 horas la confirmación del servicio')
+    return ConversationHandler.END
+
+
 
 def photo(update, context):
     user = update.message.from_user
@@ -227,6 +270,18 @@ def main():
 
             SUBSUBSUBREPARACIONES:[MessageHandler(Filters.text, subsubsubreparaciones),
                             CommandHandler('skip', start)],
+		
+ 	    CONTINUAR: [MessageHandler(Filters.regex('^(Continuar)$'), informacion),
+            CommandHandler('informacion', informacion),CommandHandler('back', subsubrepaciones)],
+
+	    INFORMACION:[MessageHandler(Filters.text, informacion2),
+                            CommandHandler('skip', start)],
+
+            INFORMACION1:[MessageHandler(Filters.text, informacion3),
+                            CommandHandler('skip', start)]
+
+ 	 
+
 
 
 
