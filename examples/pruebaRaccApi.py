@@ -58,7 +58,7 @@ def selector(update, context):
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text('Usted ha seleccionado')
     update.message.reply_text(update.message.text)
-    update.message.reply_text('Introduzca Continuar sino introduzca /volver')
+    update.message.reply_text('Introduzca /continuar sino introduzca /volver',reply_markup=ReplyKeyboardRemove())
 
     if selecion1 == 'Reparaciones' :
         return REPARACIONES
@@ -101,13 +101,14 @@ def subreparaciones(update , context):
 def subsubrepaciones(update , context):
     global selecion3
     if(update.message.text != '/back'):
-	    selecion3 = update.message.text
+        selecion3 = update.message.text
 
     if(selecion3=='Reparacion en casa'):
          reply_keyboard = [['2 horas', '3 horas','4 horas']]
          update.message.reply_text(
-         'Seleccione la opcion que usted quiera .'
-         'Envia  /cancel para dejar de hablar conmigo.\n\n',
+         'Seleccione cuantas horas nececitara nuestro servicio.'
+         'Envia  /cancel para dejar de hablar conmigo.\n\n'
+         'Evia /back para cambiar de servicio',
           reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     
     return SUBSUBSUBREPARACIONES
@@ -122,16 +123,16 @@ def subsubsubreparaciones(update,context):
         update.message.reply_text('Precio : 111,08')
 
 
-    update.message.reply_text( 	'Para continuar introducir Continuar o /informacion\n\n'
-				'Para volver al menú  /volver\n\n'
+    update.message.reply_text(  'Para continuar introducir Continuar o /informacion\n\n'
+                'Para volver al menú  /volver\n\n'
                                 'Para salir pulse /cancel\n\n'
-				'Para cambiar numero de horas pulse /back\n\n')
+                'Para cambiar numero de horas pulse /back\n\n',reply_markup=ReplyKeyboardRemove())
     return CONTINUAR 
 
 
 def informacion(update,context):
 
-    update.message.reply_text( 	'Introduca email')
+    update.message.reply_text(  'Introduca email')
     
     return INFORMACION 
 
@@ -227,7 +228,7 @@ def main():
 
         states={
             REPARACIONES: [ MessageHandler(Filters.regex('^(Continuar)$'), reparaciones),
-             CommandHandler('reparaciones', reparaciones)],
+             CommandHandler('reparaciones', reparaciones),CommandHandler('continuar', reparaciones)],
 
             TRAMITES: [MessageHandler(Filters.regex('^(Tramites)$'), start)],
 
@@ -268,19 +269,19 @@ def main():
             SUBSUBREPARACIONES:[MessageHandler(Filters.text, subsubrepaciones),
                             CommandHandler('subsubreparaciones', subsubrepaciones)],
 
-            SUBSUBSUBREPARACIONES:[MessageHandler(Filters.text, subsubsubreparaciones),
-                            CommandHandler('skip', start)],
-		
- 	    CONTINUAR: [MessageHandler(Filters.regex('^(Continuar)$'), informacion),
+            SUBSUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(2 horas|3 horas|4 horas)$'), subsubsubreparaciones),
+                            CommandHandler('skip', start) ,CommandHandler('back', subreparaciones) ],
+        
+        CONTINUAR: [MessageHandler(Filters.regex('^(Continuar)$'), informacion),
             CommandHandler('informacion', informacion),CommandHandler('back', subsubrepaciones)],
 
-	    INFORMACION:[MessageHandler(Filters.text, informacion2),
+        INFORMACION:[MessageHandler(Filters.text, informacion2),
                             CommandHandler('skip', start)],
 
             INFORMACION1:[MessageHandler(Filters.text, informacion3),
                             CommandHandler('skip', start)]
 
- 	 
+     
 
 
 
