@@ -44,7 +44,7 @@ def start(update, context):
 
     update.message.reply_text(
          'Soy Nestor y voy a ser su ayudante.'
-         'Envia  /cancel para dejar de hablar conmigo.\n\n'
+         'Envia  /cancel para dejar de hablar conmigo.'
          'Que servicio quiere selecionar ?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
@@ -72,8 +72,9 @@ def reparaciones(update, context):
      'Carpintero', 'Climatizacion','Persianista'],['Parquetista','Antenista','Albañil','Cristalero'],['Electrodomesticos','Informática','Asistencia mecánica y reparación']]
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text(
-         'Seleccione la opcion que usted quiera .'
-         'Envia  /cancel para dejar de hablar conmigo.\n\n',
+         'Seleccione la opcion que usted quiera.\n\n'
+         'Envia  /cancel para dejar de hablar conmigo.\n\n'
+         'Si quiere volver al inicio pulse /volver',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return SUBREPARACIONES
@@ -88,27 +89,27 @@ def subreparaciones(update , context):
         selecion2 = update.message.text
     logger.info("Last %s", update.message.text)
 
-    update.message.reply_text(selecion2)
     if selecion2 == 'Manitas':
         reply_keyboard = [['Reparacion en casa', 'Montaje de TV', 'Montaje de muebles','Otros']]
         update.message.reply_text(
-        'Seleccione la opcion que usted quiera .'
-        'Envia  /cancel para dejar de hablar conmigo.\n\n',
+        'Seleccione la opcion que usted quiera .\n\n'
+        'Envia  /cancel para dejar de hablar conmigo.\n\n'
+        'Envia  /back para volver a elegir el servicio .\n\n',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return SUBSUBREPARACIONES
            
 
 def subsubrepaciones(update , context):
     global selecion3
-    if(update.message.text != '/back'):
+    if update.message.text != '/back':
         selecion3 = update.message.text
 
-    if(selecion3=='Reparacion en casa'):
+    if selecion3=='Reparacion en casa':
          reply_keyboard = [['2 horas', '3 horas','4 horas']]
          update.message.reply_text(
-         'Seleccione cuantas horas nececitara nuestro servicio.'
+         'Seleccione cuantas horas nececitara nuestro servicio.\n\n'
          'Envia  /cancel para dejar de hablar conmigo.\n\n'
-         'Evia /back para cambiar de servicio',
+         'Evia /back para cambiar de servicio.\n\n',
           reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     
     return SUBSUBSUBREPARACIONES
@@ -265,17 +266,17 @@ def main():
 
             SUBREPARACIONES:[MessageHandler(Filters.text, subreparaciones),
                             CommandHandler('subreparaciones', subreparaciones)],
-
-            SUBSUBREPARACIONES:[MessageHandler(Filters.text, subsubrepaciones),
-                            CommandHandler('subsubreparaciones', subsubrepaciones)],
+                                
+            SUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(Reparacion en casa|Montaje de TV|Montaje de muebles|Otros)$'), subsubrepaciones),
+                            CommandHandler('subsubreparaciones', subsubrepaciones),CommandHandler('back', reparaciones)],
 
             SUBSUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(2 horas|3 horas|4 horas)$'), subsubsubreparaciones),
                             CommandHandler('skip', start) ,CommandHandler('back', subreparaciones) ],
         
-        CONTINUAR: [MessageHandler(Filters.regex('^(Continuar)$'), informacion),
+            CONTINUAR: [MessageHandler(Filters.regex('^(Continuar)$'), informacion),
             CommandHandler('informacion', informacion),CommandHandler('back', subsubrepaciones)],
 
-        INFORMACION:[MessageHandler(Filters.text, informacion2),
+            INFORMACION:[MessageHandler(Filters.text, informacion2),
                             CommandHandler('skip', start)],
 
             INFORMACION1:[MessageHandler(Filters.text, informacion3),
