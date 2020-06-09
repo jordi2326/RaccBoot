@@ -14,11 +14,6 @@ Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
-import os,sys,inspect
-current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parent_dir = os.path.dirname(current_dir)
-sys.path.insert(0, parent_dir)
-
 import logging
 
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
@@ -45,7 +40,7 @@ def start(update, context):
      'Asistencia', 'Recados'],['Movilidad','Mascotas','Ocio y viajes']]
     user = update.message.from_user
     nom = user.first_name
-    logger.info("El usuario: %s inicio el chat", nom)
+    logger.info("Gender of %s: %s", nom, update.message.text)
 
     update.message.reply_text(
          'Soy Nestor y voy a ser su ayudante.'
@@ -54,44 +49,38 @@ def start(update, context):
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return SELECTOR
-
+    
 
 
 def selector(update, context):
+    reply_keyboard = [['Continuar', 'Volver']]
     user = update.message.from_user
     selecion1 = update.message.text
-    logger.info("El usuario: %s ha seleccionado: %s", user.first_name, update.message.text)
+    logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text('Usted ha seleccionado')
     update.message.reply_text(update.message.text)
-    update.message.reply_text('Introduzca /volver para regresar al menu principal')
+    update.message.reply_text('Introduzca /continuar sino introduzca /volver',reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     if selecion1 == 'Reparaciones' :
-        reply_keyboard = [['Manitas', 'Cerrajero', 'Electricista','Fontanero'],['Pintor',
-         'Carpintero', 'Climatizacion','Persianista'],['Parquetista','Antenista','Albañil','Cristalero'],['Electrodomesticos','Informática','Asistencia mecánica y reparación']]
-        update.message.reply_text(
-        'Seleccione la opcion que usted quiera .\n\n'
-        'Envia  /cancel para dejar de hablar conmigo.\n\n',
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-
         return REPARACIONES
 
     return VOLVER
 
 
 def reparaciones(update, context):
-    reply_keyboard = [['Manitas', 'Cerrajero', 'Electricista','Fontanero'],['Pintor',
-    'Carpintero', 'Climatizacion','Persianista'],['Parquetista','Antenista','Albañil','Cristalero'],['Electrodomesticos','Informática','Asistencia mecánica y reparación']]
     user = update.message.from_user
+    reply_keyboard = [['Manitas', 'Cerrajero', 'Electricista','Fontanero'],['Pintor',
+     'Carpintero', 'Climatizacion','Persianista'],['Parquetista','Antenista','Albañil','Cristalero'],['Electrodomesticos','Informática','Asistencia mecánica y reparación']]
     logger.info("Gender of %s: %s", user.first_name, update.message.text)
     update.message.reply_text(
-         'Envia  /back para volver a elegir el servicio.\n\n'
+         'Seleccione la opcion que usted quiera.\n\n'
          'Envia  /cancel para dejar de hablar conmigo.\n\n'
-         'Seleccione la opcion que usted quiera.',
+         'Si quiere volver al inicio pulse /volver',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return SUBREPARACIONES
 
-
+   
 
 
 
@@ -102,31 +91,32 @@ def subreparaciones(update , context):
     logger.info("Last %s", update.message.text)
 
     if selecion2 == 'Manitas':
-        reply_keyboard = [['Reparacion en casa'], ['Montaje de TV'],['Montaje de muebles'],['Otros']]
+        reply_keyboard = [['Reparacion en casa', 'Montaje de TV', 'Montaje de muebles','Otros']]
         update.message.reply_text(
         'Seleccione la opcion que usted quiera .\n\n'
         'Envia  /cancel para dejar de hablar conmigo.\n\n'
         'Envia  /back para volver a elegir el servicio .\n\n',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return SUBSUBREPARACIONES
-
+           
 
 def subsubrepaciones(update , context):
     global selecion3
-    if update.message.text != '/back':
+    if update.message.text != 'Anterior':
         selecion3 = update.message.text
 
     if selecion3=='Reparacion en casa':
-         reply_keyboard = [['2 horas'], ['3 horas'],['4 horas']]
+         reply_keyboard = [['2 horas', '3 horas','4 horas']]
          update.message.reply_text(
          'Seleccione cuantas horas nececitara nuestro servicio.\n\n'
          'Envia  /cancel para dejar de hablar conmigo.\n\n'
          'Evia /back para cambiar de servicio.\n\n',
           reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-
+    
     return SUBSUBSUBREPARACIONES
-
+                
 def subsubsubreparaciones(update,context):
+    reply_keyboard = [['Continuar', 'Volver', 'Cancelar','Anterior']]
     global selecion4
     selecion4 = update.message.text
     if selecion4=='2 horas' or selecion4=='3 horas':
@@ -136,29 +126,30 @@ def subsubsubreparaciones(update,context):
         update.message.reply_text('Precio : 111,08')
 
 
-    update.message.reply_text(  'Para continuar introducir Continuar o /informacion\n\n'
-                'Para volver al menú  /volver\n\n'
-                                'Para salir pulse /cancel\n\n'
-                'Para cambiar numero de horas pulse /back\n\n',reply_markup=ReplyKeyboardRemove())
-    return CONTINUAR
+    update.message.reply_text(  'Para continuar introducir Continuar \n\n'
+                'Para volver al menú  Volver\n\n'
+                'Para salir pulse Cancel\n\n'
+                'Para cambiar numero de horas pulse Back\n\n',reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+
+    return CONTINUAR 
 
 
 def informacion(update,context):
 
     update.message.reply_text(  'Introduca email')
-
-    return INFORMACION
+    
+    return INFORMACION 
 
 def informacion2(update,context):
-    global email
-    email = update.message.text
+    global email 
+    email = update.message.text 
     update.message.reply_text('Introduca número de telefono')
     return INFORMACION1
 
 
 def informacion3(update,context):
     global telefono
-    telefono = update.message.text
+    telefono = update.message.text 
     update.message.reply_text('Se le avisara en un máximo de 48 horas la confirmación del servicio')
     return ConversationHandler.END
 
@@ -240,8 +231,8 @@ def main():
         entry_points=[CommandHandler('start', start)],
 
         states={
-            REPARACIONES: [ MessageHandler(Filters.regex('^(Manitas|Cerrajero|Electricista|Fontanero)$'), subreparaciones),
-             CommandHandler('back', selector)],
+            REPARACIONES: [ MessageHandler(Filters.regex('^(Continuar)$'), reparaciones),
+             CommandHandler('reparaciones', reparaciones),CommandHandler('continuar', reparaciones),MessageHandler(Filters.regex('^(Volver)$'),start)],
 
             TRAMITES: [MessageHandler(Filters.regex('^(Tramites)$'), start)],
 
@@ -263,9 +254,9 @@ def main():
 
             OCIOYVIAJE: [ MessageHandler(Filters.regex('^(Ocio y viajes)$'), start)],
 
-            SELECTOR:[MessageHandler(Filters.text, selector)
+            SELECTOR:[  CommandHandler('cancel', cancel),MessageHandler(Filters.text, selector)
                    ],
-
+         
             PHOTO: [MessageHandler(Filters.photo, photo),
                     CommandHandler('skip', skip_photo)],
 
@@ -274,19 +265,23 @@ def main():
 
             BIO: [MessageHandler(Filters.text, bio)],
 
-            VOLVER:[CommandHandler('volver',start)],
+            VOLVER:[MessageHandler(Filters.regex('^(Volver)$'),start)],
 
             SUBREPARACIONES:[MessageHandler(Filters.text, subreparaciones),
-                            CommandHandler('subreparaciones', subreparaciones),CommandHandler('back', reparaciones)],
-
-            SUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(Reparacion en casa|Montaje de TV|Montaje de muebles|Otros)$'), subsubrepaciones),
+                            CommandHandler('subreparaciones', subreparaciones)],
+                                
+            SUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(Reparacion en casa|Montaje de TV|Montaje de muebles|Otros|Anterior)$'), subsubrepaciones),
                             CommandHandler('subsubreparaciones', subsubrepaciones),CommandHandler('back', reparaciones)],
 
             SUBSUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(2 horas|3 horas|4 horas)$'), subsubsubreparaciones),
                             CommandHandler('skip', start) ,CommandHandler('back', subreparaciones) ],
-
-            CONTINUAR: [MessageHandler(Filters.regex('^(Continuar)$'), informacion),
-            CommandHandler('informacion', informacion),CommandHandler('back', subsubrepaciones)],
+        
+            CONTINUAR: [
+            MessageHandler(Filters.regex('^(Continuar)$'), informacion),
+            MessageHandler(Filters.regex('^(Anterior)$'),subsubrepaciones),
+            MessageHandler(Filters.regex('^(Cancelar)$'),cancel),
+            MessageHandler(Filters.regex('^(Volver)$'),start)]
+            ,
 
             INFORMACION:[MessageHandler(Filters.text, informacion2),
                             CommandHandler('skip', start)],
@@ -294,7 +289,7 @@ def main():
             INFORMACION1:[MessageHandler(Filters.text, informacion3),
                             CommandHandler('skip', start)]
 
-
+     
 
 
 
@@ -321,3 +316,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
