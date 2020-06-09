@@ -180,8 +180,16 @@ def location(update, context):
     user_location = update.message.location
     logger.info("Location of %s: %f / %f", user.first_name, user_location.latitude,
                 user_location.longitude)
-    update.message.reply_text('Maybe I can visit you sometime! '
-                              'At last, tell me something about yourself.')
+    url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + str(user_location.latitude) + "," + str(user_location.longitude) + "&key=AIzaSyCdBzOsXA50MuzG8-xLz9C9LTnlBr2LiQc"
+    import requests, json, urllib3
+    logger.info(url)
+    response = requests.get(url).json()
+    logger.info(response)
+    logger.info(response["results"][0]["formatted_address"])
+    detected_address = response["results"][0]["formatted_address"]
+    update.message.reply_text('Maybe I can visit you sometime! ' + str(detected_address) +
+                              '. At last, tell me something about yourself.')
+
 
     return BIO
 
