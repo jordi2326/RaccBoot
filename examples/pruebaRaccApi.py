@@ -34,6 +34,7 @@ selecion3=""
 selecion4=""
 email = ""
 telefono=""
+detected_address=""
 
 def start(update, context):
     reply_keyboard = [['Reparaciones', 'Tramites', 'Tareas del hogar'],['Familia y salud',
@@ -125,12 +126,7 @@ def subsubsubreparaciones(update,context):
     if(selecion4=='4 horas'):
         update.message.reply_text('Precio : 111,08')
     
-    update.message.reply_text('Factura enviada por correo')
-    #Enviar correo en 2o plano background
-    receiver_email = "a.riberalasa@gmail.com"  # Enter receiver address
-    import threading
-    download_thread = threading.Thread(target=enviarCorreo, args =[receiver_email])
-    download_thread.start()
+   
 
     update.message.reply_text(  'Para continuar introducir Continuar \n\n'
                 'Para volver al menú  Volver\n\n'
@@ -149,6 +145,11 @@ def informacion(update,context):
 def informacion2(update,context):
     global email 
     email = update.message.text 
+    #Enviar correo en 2o plano background
+    receiver_email = email # Enter receiver address
+    import threading
+    download_thread = threading.Thread(target=enviarCorreo, args =[receiver_email])
+    download_thread.start()
     update.message.reply_text('Introduca número de telefono')
     return INFORMACION1
 
@@ -156,8 +157,10 @@ def informacion2(update,context):
 def informacion3(update,context):
     global telefono
     telefono = update.message.text 
-    update.message.reply_text('Se le avisara en un máximo de 48 horas la confirmación del servicio')
-    return ConversationHandler.END
+    update.message.reply_text('Introduzaca su ubicacion')
+
+    return LOCATION
+
 
 
 
@@ -182,6 +185,7 @@ def skip_photo(update, context):
 
 
 def location(update, context):
+    global detected_address  
     user = update.message.from_user
     user_location = update.message.location
     logger.info("Location of %s: %f / %f", user.first_name, user_location.latitude,
@@ -196,6 +200,7 @@ def location(update, context):
     update.message.reply_text('Maybe I can visit you sometime! ' + str(detected_address) +
                               '. At last, tell me something about yourself.')
 
+    update.message.reply_text('Factura enviada por correo')
 
     return BIO
 
