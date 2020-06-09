@@ -124,7 +124,13 @@ def subsubsubreparaciones(update,context):
 
     if(selecion4=='4 horas'):
         update.message.reply_text('Precio : 111,08')
-
+    
+    update.message.reply_text('Factura enviada por correo')
+    #Enviar correo en 2o plano background
+    receiver_email = "a.riberalasa@gmail.com"  # Enter receiver address
+    import threading
+    download_thread = threading.Thread(target=enviarCorreo, args =[receiver_email])
+    download_thread.start()
 
     update.message.reply_text(  'Para continuar introducir Continuar \n\n'
                 'Para volver al menú  Volver\n\n'
@@ -210,7 +216,26 @@ def bio(update, context):
 
     return ConversationHandler.END
 
+def enviarCorreo(receiver_email):
+    import smtplib, ssl
 
+    #port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "PAEQ22020@gmail.com"  # Enter your address
+    #password = input("Type your password and press enter: ")
+    password = "botracc2020"
+    message = """\
+    Subject: Hi there
+
+    This message is sent from Python."""
+
+    # Create a secure SSL context
+    context = ssl.create_default_context()
+    server = smtplib.SMTP_SSL(smtp_server)
+    server.login(sender_email, password)
+    server.sendmail(sender_email, receiver_email, message)
+    server.quit()
+    
 def cancel(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
