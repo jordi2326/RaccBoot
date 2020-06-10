@@ -200,7 +200,7 @@ def location(update, context):
     update.message.reply_text('Maybe I can visit you sometime! ' + str(detected_address) +
                               '. At last, tell me something about yourself.')
 
-    update.message.reply_text('Factura enviada por correo')
+    update.message.reply_text('Presupuesto enviado por correo')
 
     return BIO
 
@@ -222,23 +222,80 @@ def bio(update, context):
     return ConversationHandler.END
 
 def enviarCorreo(receiver_email):
-    import smtplib, ssl
+    import email, smtplib, ssl
+    from email import encoders
+    from email.mime.base import MIMEBase
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
 
     #port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = "PAEQ22020@gmail.com"  # Enter your address
     #password = input("Type your password and press enter: ")
     password = "botracc2020"
-    message = """\
-    Subject: Hi there
 
-    This message is sent from Python."""
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "Presupuesto manitas"
+    message["From"] = "Bot RACC"
+    message["To"] = receiver_email
+
+    # Create the plain-text and HTML version of your message
+    text = """\
+    Hola,
+    Adjuntamos el presupuesto de los servicios que ha solicitado.
+    Muchas gracias por su confianza.
+    
+    Atentamente,
+    RACC"""
+    html = """\
+    <html>
+      <body>
+        <p>Hola,<br>
+           Adjuntamos el presupuesto de los servicios que ha solicitado.<br>
+           Muchas gracias por su confianza.<br>
+           <br>
+           Atentamente,<br>
+           RACC
+        </p>
+      </body>
+    </html>
+    """
+
+    # Turn these into plain/html MIMEText objects
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    # Add HTML/plain-text parts to MIMEMultipart message
+    # The email client will try to render the last part first
+    message.attach(part1)
+    message.attach(part2)
+
+    filename = "Presupuesto.pdf"  # In same directory as script
+
+    # Open PDF file in binary mode
+    with open(filename, "rb") as attachment:
+        # Add file as application/octet-stream
+        # Email client can usually download this automatically as attachment
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+
+    # Encode file in ASCII characters to send by email
+    encoders.encode_base64(part)
+
+    # Add header as key/value pair to attachment part
+    part.add_header(
+        "Content-Disposition",
+        f"attachment; filename= {filename}",
+    )
+
+    # Add attachment to message and convert message to string
+    message.attach(part)
 
     # Create a secure SSL context
     context = ssl.create_default_context()
     server = smtplib.SMTP_SSL(smtp_server)
     server.login(sender_email, password)
-    server.sendmail(sender_email, receiver_email, message)
+    server.sendmail(sender_email, receiver_email, message.as_string())
     server.quit()
     
 def cancel(update, context):
