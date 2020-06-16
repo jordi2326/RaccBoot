@@ -308,6 +308,7 @@ def cancel(update, context):
 
   
 def pagar(update, context):
+    #para testear: 4242424242424242,6,2021,314
     tarjeta_info = update.message.text.split(",")
     import stripe
     stripe.api_key = "sk_test_51GtXF4Cpb85sHqrBKXCKSmG1BWAPeHiZLEsx9cPIpbjFF2YmhaJgeT5Ynt71pQPG6MvkTcLFSFcsFMH755pqhXkK00eRFJVb17"
