@@ -50,7 +50,7 @@ def start(update, context):
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return SELECTOR
-    
+
 
 
 def selector(update, context):
@@ -81,7 +81,7 @@ def reparaciones(update, context):
 
     return SUBREPARACIONES
 
-   
+
 
 
 
@@ -99,7 +99,7 @@ def subreparaciones(update , context):
         'Envia  /back para volver a elegir el servicio .\n\n',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return SUBSUBREPARACIONES
-           
+
 
 def subsubrepaciones(update , context):
     global selecion3
@@ -113,9 +113,9 @@ def subsubrepaciones(update , context):
          'Envia  /cancel para dejar de hablar conmigo.\n\n'
          'Evia /back para cambiar de servicio.\n\n',
           reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-    
+
     return SUBSUBSUBREPARACIONES
-                
+
 def subsubsubreparaciones(update,context):
     reply_keyboard = [['Continuar', 'Volver', 'Cancelar','Anterior']]
     global selecion4
@@ -125,26 +125,26 @@ def subsubsubreparaciones(update,context):
 
     if(selecion4=='4 horas'):
         update.message.reply_text('Precio : 111,08')
-    
-   
+
+
 
     update.message.reply_text(  'Para continuar introducir Continuar \n\n'
                 'Para volver al menú  Volver\n\n'
                 'Para salir pulse Cancel\n\n'
                 'Para cambiar numero de horas pulse Back\n\n',reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
-    return CONTINUAR 
+    return CONTINUAR
 
 
 def informacion(update,context):
 
     update.message.reply_text(  'Introduca email')
-    
-    return INFORMACION 
+
+    return INFORMACION
 
 def informacion2(update,context):
-    global email 
-    email = update.message.text 
+    global email
+    email = update.message.text
     #Enviar correo en 2o plano background
     receiver_email = email # Enter receiver address
     import threading
@@ -156,10 +156,10 @@ def informacion2(update,context):
 
 def informacion3(update,context):
     global telefono
-    telefono = update.message.text 
-    update.message.reply_text('Introduzaca su ubicacion')
+    telefono = update.message.text
+    update.message.reply_text('Envie fotos para más detalles')
 
-    return LOCATION
+    return PHOTO
 
 
 
@@ -169,8 +169,7 @@ def photo(update, context):
     photo_file = update.message.photo[-1].get_file()
     photo_file.download('user_photo.jpg')
     logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
-    update.message.reply_text('Gorgeous! Now, send me your location please, '
-                              'or send /skip if you don\'t want to.')
+    update.message.reply_text('Introduzca su ubicación')
 
     return LOCATION
 
@@ -185,7 +184,7 @@ def skip_photo(update, context):
 
 
 def location(update, context):
-    global detected_address  
+    global detected_address
     user = update.message.from_user
     user_location = update.message.location
     logger.info("Location of %s: %f / %f", user.first_name, user_location.latitude,
@@ -244,7 +243,7 @@ def enviarCorreo(receiver_email):
     Hola,
     Adjuntamos el presupuesto de los servicios que ha solicitado.
     Muchas gracias por su confianza.
-    
+
     Atentamente,
     RACC"""
     html = """\
@@ -285,7 +284,7 @@ def enviarCorreo(receiver_email):
     # Add header as key/value pair to attachment part
     part.add_header(
         "Content-Disposition",
-        f"attachment; filename= {filename}",
+        "attachment; filename= {filename}",
     )
 
     # Add attachment to message and convert message to string
@@ -297,7 +296,7 @@ def enviarCorreo(receiver_email):
     server.login(sender_email, password)
     server.sendmail(sender_email, receiver_email, message.as_string())
     server.quit()
-    
+
 def cancel(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
@@ -351,9 +350,9 @@ def main():
 
             SELECTOR:[  CommandHandler('cancel', cancel),MessageHandler(Filters.text, selector)
                    ],
-         
+
             PHOTO: [MessageHandler(Filters.photo, photo),
-                    CommandHandler('skip', skip_photo)],
+                    CommandHandler('skip', photo)],
 
             LOCATION: [MessageHandler(Filters.location, location),
                        CommandHandler('skip', skip_location)],
@@ -364,13 +363,13 @@ def main():
 
             SUBREPARACIONES:[MessageHandler(Filters.text, subreparaciones),
                             CommandHandler('subreparaciones', subreparaciones)],
-                                
+
             SUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(Reparacion en casa|Montaje de TV|Montaje de muebles|Otros|Anterior)$'), subsubrepaciones),
                             CommandHandler('subsubreparaciones', subsubrepaciones),CommandHandler('back', reparaciones)],
 
             SUBSUBSUBREPARACIONES:[MessageHandler(Filters.regex('^(2 horas|3 horas|4 horas)$'), subsubsubreparaciones),
                             CommandHandler('skip', start) ,CommandHandler('back', subreparaciones) ],
-        
+
             CONTINUAR: [
             MessageHandler(Filters.regex('^(Continuar)$'), informacion),
             MessageHandler(Filters.regex('^(Anterior)$'),subsubrepaciones),
@@ -384,7 +383,7 @@ def main():
             INFORMACION1:[MessageHandler(Filters.text, informacion3),
                             CommandHandler('skip', start)]
 
-     
+
 
 
 
@@ -411,4 +410,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
