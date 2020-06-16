@@ -26,7 +26,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-GENDER, PHOTO, LOCATION, BIO,REPARACIONES,TRAMITES,TAREASHOGAR,FAMILIAYSALUD,ASISTENCIA,RECADOS,MOVILIDAD,MASCOTAS,OCIOYVIAJE,SELECTOR,VOLVER ,SUBREPARACIONES,SUBSUBREPARACIONES,SUBSUBSUBREPARACIONES,BACK,CONTINUAR,INFORMACION,INFORMACION1= range(22)
+GENDER, PHOTO, LOCATION, BIO,REPARACIONES,TRAMITES,TAREASHOGAR,FAMILIAYSALUD,ASISTENCIA,RECADOS,MOVILIDAD,MASCOTAS,OCIOYVIAJE,SELECTOR,VOLVER ,SUBREPARACIONES,SUBSUBREPARACIONES,SUBSUBSUBREPARACIONES,BACK,CONTINUAR,INFORMACION,INFORMACION1,PAGAR= range(23)
 
 selecion1=""
 selecion2=""
@@ -306,10 +306,38 @@ def cancel(update, context):
     return ConversationHandler.END
 
 
+  
+def pagar(update, context):
+    tarjeta_info = update.message.text.split(",")
+    import stripe
+    stripe.api_key = "sk_test_51GtXF4Cpb85sHqrBKXCKSmG1BWAPeHiZLEsx9cPIpbjFF2YmhaJgeT5Ynt71pQPG6MvkTcLFSFcsFMH755pqhXkK00eRFJVb17"
+
+    charge = stripe.Charge.create(
+        amount=2300,
+        currency="usd",
+        description="My First Test Charge (created for API docs)",
+        source=stripe.Token.create(
+            card={
+                "number": tarjeta_info[0],
+                "exp_month": int(tarjeta_info[1]),
+                "exp_year": int(tarjeta_info[2]),
+                "cvc": tarjeta_info[3],
+            },
+        ),
+    )
+    return SELECTOR
+
+
+def skip_pagar(update, context):
+    user = update.message.from_user
+    return SELECTOR
+  
+  
 def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
+    
 
 def main():
     # Create the Updater and pass it your bot's token.
@@ -376,6 +404,9 @@ def main():
             MessageHandler(Filters.regex('^(Cancelar)$'),cancel),
             MessageHandler(Filters.regex('^(Volver)$'),start)]
             ,
+          
+            PAGAR: [MessageHandler(Filters.text, pagar),
+                       CommandHandler('skip', skip_pagar)],
 
             INFORMACION:[MessageHandler(Filters.text, informacion2),
                             CommandHandler('skip', start)],
