@@ -45,12 +45,14 @@ def start(update, context):
                       ['Movilidad', 'Mascotas', 'Ocio y viajes']]
     user = update.message.from_user
     nom = user.first_name
-    logger.info("Gender of %s: %s", nom, update.message.text)
+    logger.info("%s: %s", nom, update.message.text)
 
     update.message.reply_text(
-        'Soy Nestor y voy a ser su ayudante.'
-        'Envia  /cancel para dejar de hablar conmigo.'
-        'Que servicio quiere selecionar ?',
+        '¡Bienvenido! Soy Nestor y voy a ser tu asistente personal.\n\n'
+        'Pídeme lo que quieras y disfruta de tu tiempo para las cosas que realmente importan.\n'
+        'Reserva tu servicio en pocos pasos y obtén un presupuesto al momento.\n'
+        'Puedes enviar "/cancel" en cualquier momento para dejar de hablar conmigo.\n\n'
+        '¿Que servicio necesitas?\n',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return SELECTOR
@@ -60,10 +62,10 @@ def selector(update, context):
     reply_keyboard = [['Continuar', 'Volver']]
     user = update.message.from_user
     selecion1 = update.message.text
-    logger.info("Gender of %s: %s", user.first_name, update.message.text)
-    update.message.reply_text('Usted ha seleccionado')
-    update.message.reply_text(update.message.text)
-    update.message.reply_text('Introduzca /continuar sino introduzca /volver',
+    logger.info("%s: %s", user.first_name, update.message.text)
+    update.message.reply_text("Has seleccionado: " + str(selecion1))
+    #update.message.reply_text(update.message.text)
+    update.message.reply_text('Introduzca /continuar si no introduzca /volver',
                               reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     if selecion1 == 'Reparaciones':
@@ -74,16 +76,16 @@ def selector(update, context):
 
 def reparaciones(update, context):
     user = update.message.from_user
-    reply_keyboard = [['Manitas', 'Cerrajero', 'Electricista', 'Fontanero'], ['Pintor',
-                                                                              'Carpintero', 'Climatizacion',
-                                                                              'Persianista'],
+    reply_keyboard = [['Manitas', 'Cerrajero', 'Electricista', 'Fontanero'],
+                      ['Pintor','Carpintero', 'Climatización','Persianista'],
                       ['Parquetista', 'Antenista', 'Albañil', 'Cristalero'],
-                      ['Electrodomesticos', 'Informática', 'Asistencia mecánica y reparación']]
-    logger.info("Gender of %s: %s", user.first_name, update.message.text)
+                      ['Electrodomésticos', 'Informática', 'Asistencia mecánica y reparación']]
+    logger.info("%s: %s", user.first_name, update.message.text)
     update.message.reply_text(
-        'Seleccione la opcion que usted quiera.\n\n'
-        'Envia  /cancel para dejar de hablar conmigo.\n\n'
-        'Si quiere volver al inicio pulse /volver',
+        '¿Que tipo de reparaciones necesitas?\n\n'
+        'Selecciona la opción que quieras.\n\n'
+        'Envía /cancel para dejar de hablar conmigo.\n\n'
+        'Si quieres volver al inicio pulsa /volver',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return SUBREPARACIONES
@@ -94,13 +96,17 @@ def subreparaciones(update, context):
     if (update.message.text != '/back'):
         selecion2 = update.message.text
     logger.info("Last %s", update.message.text)
-
+    update.message.reply_text("Has seleccionado: " + str(selecion2))
     if selecion2 == 'Manitas':
-        reply_keyboard = [['Reparacion en casa', 'Montaje de TV', 'Montaje de muebles', 'Otros']]
+        reply_keyboard = [['Reparación en casa', 'Montaje de TV', 'Montaje de muebles', 'Otros']]
         update.message.reply_text(
-            'Seleccione la opcion que usted quiera .\n\n'
-            'Envia  /cancel para dejar de hablar conmigo.\n\n'
-            'Envia  /back para volver a elegir el servicio .\n\n',
+            '¡Dinos que necesitas y nos encargamos de todo!\n'
+            'Manitas verificados de confianza.\n'
+            'Garantía de 6 meses.\n'
+            'Desplazamiento incluido.\n\n'
+            'Selecciona la opción que quieras.\n\n'
+            'Envía /cancel para dejar de hablar conmigo.\n\n'
+            'Envía /back para volver a elegir el servicio.\n\n',
             reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
     return SUBSUBREPARACIONES
 
@@ -110,12 +116,12 @@ def subsubrepaciones(update, context):
     if update.message.text != 'Anterior':
         selecion3 = update.message.text
 
-    if selecion3 == 'Reparacion en casa':
+    if selecion3 == 'Reparación en casa':
         reply_keyboard = [['2 horas', '3 horas', '4 horas']]
         update.message.reply_text(
-            'Seleccione cuantas horas nececitara nuestro servicio.\n\n'
-            'Envia  /cancel para dejar de hablar conmigo.\n\n'
-            'Evia /back para cambiar de servicio.\n\n',
+            'Indica el numero de horas que más se adapte a tus necesidades.\n\n'
+            'Envía /cancel para dejar de hablar conmigo.\n\n'
+            'Envía /back para cambiar de servicio.\n\n',
             reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return SUBSUBSUBREPARACIONES
@@ -127,24 +133,24 @@ def subsubsubreparaciones(update, context):
     global presupuesto
     selecion4 = update.message.text
     if selecion4 == '2 horas' or selecion4 == '3 horas':
-        update.message.reply_text('Precio : 61,71')
+        update.message.reply_text('Precio : 61,71 €')
         presupuesto = 61.71
 
     if (selecion4 == '4 horas'):
-        update.message.reply_text('Precio : 111,08')
+        update.message.reply_text('Precio : 111,08 €')
         presupuesto = 111.08
 
     update.message.reply_text('Para continuar introducir Continuar \n\n'
-                              'Para volver al menú  Volver\n\n'
-                              'Para salir pulse Cancel\n\n'
-                              'Para cambiar numero de horas pulse Back\n\n',
+                              'Para volver al menú Volver\n\n'
+                              'Para salir pulsa Cancel\n\n'
+                              'Para cambiar el numero de horas pulsa Back\n\n',
                               reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return CONTINUAR
 
 
 def informacion(update, context):
-    update.message.reply_text('Introduca email')
+    update.message.reply_text('Introduzca correo electrónico')
 
     return INFORMACION1
 
@@ -157,14 +163,14 @@ def informacion2(update, context):
     import threading
     download_thread = threading.Thread(target=enviarCorreo, args=[receiver_email])
     download_thread.start()
-    update.message.reply_text('Introduca número de telefono')
+    update.message.reply_text('Introduzca número de teléfono')
     return INFORMACION1
 
 
 def informacion3(update, context):
     global telefono
     telefono = update.message.text
-    update.message.reply_text('Envie fotos para más detalles')
+    update.message.reply_text('Envíe fotos para más detalles')
 
     return PHOTO
 
@@ -205,7 +211,9 @@ def location(update, context):
     update.message.reply_text('Maybe I can visit you sometime! ' + str(detected_address) +
                               '. At last, tell me something about yourself.')
 
-    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314')
+    update.message.reply_text('Presupuesto enviado por correo. \n'
+                              'Para pagar introduzca la tarjeta bancaria en formato: [numero],[mes],[año],[cvc]. \n'
+                              'Por ejemplo: 4242424242424242,6,2021,314')
 
     return PAGAR
 
@@ -222,7 +230,7 @@ def skip_location(update, context):
 def bio(update, context):
     user = update.message.from_user
     logger.info("Bio of %s: %s", user.first_name, update.message.text)
-    update.message.reply_text('Gracias! Espero poder hablar de nuevo con usted .')
+    update.message.reply_text('¡Gracias! Espero poder hablar de nuevo con usted.')
 
     return ConversationHandler.END
 
@@ -308,7 +316,7 @@ def enviarCorreo(receiver_email):
 def cancel(update, context):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text('Adios! Espero poder hablar de nuevo con usted .',
+    update.message.reply_text('¡Adiós! Espero poder hablar de nuevo con usted.',
                               reply_markup=ReplyKeyboardRemove())
 
     return ConversationHandler.END
@@ -399,7 +407,7 @@ def main():
                               CommandHandler('subreparaciones', subreparaciones)],
 
             SUBSUBREPARACIONES: [
-                MessageHandler(Filters.regex('^(Reparacion en casa|Montaje de TV|Montaje de muebles|Otros|Anterior)$'),
+                MessageHandler(Filters.regex('^(Reparación en casa|Montaje de TV|Montaje de muebles|Otros|Anterior)$'),
                                subsubrepaciones),
                 CommandHandler('subsubreparaciones', subsubrepaciones), CommandHandler('back', reparaciones)],
 
