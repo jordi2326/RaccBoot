@@ -207,9 +207,13 @@ def location(update, context):
     response = requests.get(url).json()
     logger.info(response)
     logger.info(response["results"][0]["formatted_address"])
-    detected_address = response["results"][0]["formatted_address"]
-    update.message.reply_text('Maybe I can visit you sometime! ' + str(detected_address) +
-                              '. At last, tell me something about yourself.')
+    detected_address = response["results"][0]["address_components"][1]["long_name"] + ", " + \
+                       response["results"][0]["address_components"][6]["long_name"] + ", " + \
+                       response["results"][0]["address_components"][2]["long_name"] + ", " + \
+                       response["results"][0]["address_components"][3]["long_name"] + ", " + \
+                       response["results"][0]["address_components"][4]["long_name"] + ", " + \
+                       response["results"][0]["address_components"][5]["long_name"]
+    update.message.reply_text(str(detected_address))
 
     update.message.reply_text('Presupuesto enviado por correo. \n'
                               'Para pagar introduzca la tarjeta bancaria en formato: [numero],[mes],[año],[cvc]. \n'
