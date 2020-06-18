@@ -341,13 +341,13 @@ def pagar(update, context):
             },
         ),
     )
-    return BIO
+    bio(update,context)
 
 
 def skip_pagar(update, context):
     user = update.message.from_user
     update.message.reply_text("skip pagar")
-    return BIO
+    bio(update,context)
 
 
 def error(update, context):
