@@ -146,7 +146,7 @@ def subsubsubreparaciones(update, context):
 def informacion(update, context):
     update.message.reply_text('Introduca email')
 
-    return INFORMACION1
+    return INFORMACION
 
 
 def informacion2(update, context):
