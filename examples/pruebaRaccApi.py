@@ -170,7 +170,7 @@ def informacion2(update, context):
 def informacion3(update, context):
     global telefono
     telefono = update.message.text
-    update.message.reply_text('Envíe fotos para más detalles')
+    update.message.reply_text('Envíe fotos para más detalles o /skip para omitir')
 
     return PHOTO
 
@@ -180,7 +180,7 @@ def photo(update, context):
     photo_file = update.message.photo[-1].get_file()
     photo_file.download('user_photo.jpg')
     logger.info("Photo of %s: %s", user.first_name, 'user_photo.jpg')
-    update.message.reply_text('Introduzca su ubicación')
+    update.message.reply_text('Introduzca su ubicación o /skip para omitir')
 
     return LOCATION
 
@@ -188,8 +188,7 @@ def photo(update, context):
 def skip_photo(update, context):
     user = update.message.from_user
     logger.info("User %s did not send a photo.", user.first_name)
-    update.message.reply_text('I bet you look great! Now, send me your location please, '
-                              'or send /skip.')
+    update.message.reply_text('Introduzca su ubicación o /skip para omitir')
 
     return LOCATION
 
@@ -225,10 +224,11 @@ def location(update, context):
 def skip_location(update, context):
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
-    update.message.reply_text('You seem a bit paranoid! '
-                              'At last, tell me something about yourself.')
+    update.message.reply_text('Presupuesto enviado por correo. \n'
+                              'Para pagar introduzca la tarjeta bancaria en formato: [numero],[mes],[año],[cvc]. \n'
+                              'Por ejemplo: 4242424242424242,6,2021,314')
 
-    return BIO
+    return PAGAR
 
 
 def bio(update, context):
@@ -398,7 +398,7 @@ def main():
                        ],
 
             PHOTO: [MessageHandler(Filters.photo, photo),
-                    CommandHandler('skip', photo)],
+                    CommandHandler('skip', skip_photo)],
 
             LOCATION: [MessageHandler(Filters.location, location),
                        CommandHandler('skip', skip_location)],
