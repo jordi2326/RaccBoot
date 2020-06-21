@@ -185,12 +185,7 @@ def photo(update, context):
     return LOCATION
 
 
-def skip_photo(update, context):
-    user = update.message.from_user
-    logger.info("User %s did not send a photo.", user.first_name)
-    update.message.reply_text('Introduzca su ubicación o /skip para omitir')
 
-    return LOCATION
 
 
 def location(update, context):
@@ -220,7 +215,12 @@ def location(update, context):
 
     return PAGAR
 
+def introloc(update, context):
+    
+    update.message.reply_text('Introduzca su ubicación')
 
+    return LOCATION
+  
 def skip_location(update, context):
     user = update.message.from_user
     logger.info("User %s did not send a location.", user.first_name)
@@ -397,8 +397,9 @@ def main():
             SELECTOR:[  CommandHandler('cancel', cancel),MessageHandler(Filters.regex('^(Reparaciones)$'), reparaciones)],
 
 
-            PHOTO: [MessageHandler(Filters.photo, photo),
-                    CommandHandler('skip', skip_photo)],
+             PHOTO: [MessageHandler(Filters.photo, photo),
+                    CommandHandler('skip', introloc)],
+
 
             LOCATION: [MessageHandler(Filters.location, location),
                        CommandHandler('skip', skip_location)],
