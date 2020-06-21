@@ -303,14 +303,15 @@ def enviarCorreo(receiver_email):
     # Add header as key/value pair to attachment part
     part.add_header(
         "Content-Disposition",
-        "attachment; filename= {filename}",
+        f"attachment; filename= {filename}",
     )
 
     # Add attachment to message and convert message to string
     message.attach(part)
 
     # Create a secure SSL context
-    context = ssl.create_default_context()
+    #context = ssl.create_default_context()
+    ssl.create_default_context()
     server = smtplib.SMTP_SSL(smtp_server)
     server.login(sender_email, password)
     server.sendmail(sender_email, receiver_email, message.as_string())
@@ -403,7 +404,7 @@ def main():
             LOCATION: [MessageHandler(Filters.location, location),
                        CommandHandler('skip', skip_location)],
 
-            BIO: [MessageHandler(Filters.text, bio)],
+            BIO: [MessageHandler(Filters.regex('^(Volver)$'), bio)],
 
             VOLVER: [MessageHandler(Filters.regex('^(Volver)$'), start)],
 
