@@ -113,7 +113,7 @@ def subreparaciones(update, context):
 
 def subsubrepaciones(update, context):
     global selecion3
-    if update.message.text != 'Anterior':
+    if update.message.text != 'Back':
         selecion3 = update.message.text
 
     if selecion3 == 'Reparación en casa':
@@ -394,8 +394,8 @@ def main():
 
             OCIOYVIAJE: [MessageHandler(Filters.regex('^(Ocio y viajes)$'), start)],
 
-            SELECTOR: [CommandHandler('cancel', cancel), MessageHandler(Filters.text, selector)
-                       ],
+            SELECTOR:[  CommandHandler('cancel', cancel),MessageHandler(Filters.regex('^(Reparaciones)$'), reparaciones)],
+
 
             PHOTO: [MessageHandler(Filters.photo, photo),
                     CommandHandler('skip', skip_photo)],
@@ -420,9 +420,9 @@ def main():
 
             CONTINUAR: [
                 MessageHandler(Filters.regex('^(Continuar)$'), informacion),
-                MessageHandler(Filters.regex('^(Anterior)$'), subsubrepaciones),
-                MessageHandler(Filters.regex('^(Cancelar)$'), cancel),
-                MessageHandler(Filters.regex('^(Volver)$'), start)]
+            MessageHandler(Filters.regex('^(Back)$'),subsubrepaciones),
+            MessageHandler(Filters.regex('^(Cancelar)$'),cancel),
+            MessageHandler(Filters.regex('^(Volver)$'),start)]
             ,
 
             PAGAR: [MessageHandler(Filters.text, pagar),
