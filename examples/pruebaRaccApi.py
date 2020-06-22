@@ -231,7 +231,7 @@ def skip_fecha(update, context):
 
 
 def introloc(update, context):
-    update.message.reply_text('Introduzca su ubicación')
+    update.message.reply_text('Introduzca su ubicación o /skip para omitir')
 
     return LOCATION
 
@@ -309,7 +309,7 @@ def enviarCorreo(receiver_email):
     # Add header as key/value pair to attachment part
     part.add_header(
         "Content-Disposition",
-        "attachment; filename= {filename}",
+        f"attachment; filename= {filename}",
     )
 
     # Add attachment to message and convert message to string
