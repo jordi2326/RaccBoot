@@ -209,23 +209,23 @@ def location(update, context):
 def location_manual(update, context):
     global detected_address_extra
     detected_address_extra = update.message.text
-    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar ese puse introduce /skip")
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar este paso introduce /skip")
     return FECHA
 
 def skip_location_manual(update, context):
-    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar ese puse introduce /skip")
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar este paso introduce /skip")
     return FECHA
 
 def skip_location(update, context):
-    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar ese puse introduce /skip")
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar este paso introduce /skip")
     return FECHA
 
 def fecha(update, context):
-    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314')
+    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
     return PAGAR
 
 def skip_fecha(update, context):
-    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314')
+    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
     return PAGAR
 
 
@@ -351,13 +351,13 @@ def pagar(update, context):
             },
         ),
     )
-    bio(update, context)
+    return BIO
 
 
 def skip_pagar(update, context):
     user = update.message.from_user
     update.message.reply_text("skip pagar")
-    bio(update, context)
+    return BIO
 
 
 def error(update, context):
@@ -371,7 +371,7 @@ def main():
     # Post version 12 this will no longer be necessary
     updater = Updater("1197852167:AAETya5xtPT06hjp8VJQxbZQuL5M7Fk8h8k", use_context=True)
 
-    
+
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
