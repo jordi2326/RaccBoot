@@ -26,8 +26,8 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-GENDER, PHOTO, LOCATION, BIO, REPARACIONES, TRAMITES, TAREASHOGAR, FAMILIAYSALUD, ASISTENCIA, RECADOS, MOVILIDAD, MASCOTAS, OCIOYVIAJE, SELECTOR, VOLVER, SUBREPARACIONES, SUBSUBREPARACIONES, SUBSUBSUBREPARACIONES, BACK, CONTINUAR, INFORMACION, INFORMACION1, PAGAR = range(
-    23)
+GENDER, PHOTO, LOCATION, LOCATIONMANUAL, BIO, REPARACIONES, TRAMITES, TAREASHOGAR, FAMILIAYSALUD, ASISTENCIA, RECADOS, MOVILIDAD, MASCOTAS, OCIOYVIAJE, SELECTOR, VOLVER, SUBREPARACIONES, SUBSUBREPARACIONES, SUBSUBSUBREPARACIONES, BACK, CONTINUAR, INFORMACION, INFORMACION1, PAGAR, FECHA = range(
+    25)
 
 selecion1 = ""
 selecion2 = ""
@@ -36,6 +36,7 @@ selecion4 = ""
 email = ""
 telefono = ""
 detected_address = ""
+detected_address_extra = ""
 presupuesto = 0
 
 
@@ -64,7 +65,7 @@ def selector(update, context):
     selecion1 = update.message.text
     logger.info("%s: %s", user.first_name, update.message.text)
     update.message.reply_text("Has seleccionado: " + str(selecion1))
-    #update.message.reply_text(update.message.text)
+    # update.message.reply_text(update.message.text)
     update.message.reply_text('Introduzca /continuar si no introduzca /volver',
                               reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
@@ -77,7 +78,7 @@ def selector(update, context):
 def reparaciones(update, context):
     user = update.message.from_user
     reply_keyboard = [['Manitas', 'Cerrajero', 'Electricista', 'Fontanero'],
-                      ['Pintor','Carpintero', 'Climatización','Persianista'],
+                      ['Pintor', 'Carpintero', 'Climatización', 'Persianista'],
                       ['Parquetista', 'Antenista', 'Albañil', 'Cristalero'],
                       ['Electrodomésticos', 'Informática', 'Asistencia mecánica y reparación']]
     logger.info("%s: %s", user.first_name, update.message.text)
@@ -98,7 +99,7 @@ def subreparaciones(update, context):
     logger.info("Last %s", update.message.text)
     update.message.reply_text("Has seleccionado: " + str(selecion2))
     if selecion2 == 'Manitas':
-        reply_keyboard = [['Reparación en casa', 'Montaje de TV', 'Montaje de muebles', 'Otros']]
+        reply_keyboard = [['Reparación en casa', 'Montaje de TV'],['Montaje de muebles', 'Otros']]
         update.message.reply_text(
             '¡Dinos que necesitas y nos encargamos de todo!\n'
             'Manitas verificados de confianza.\n'
@@ -128,7 +129,7 @@ def subsubrepaciones(update, context):
 
 
 def subsubsubreparaciones(update, context):
-    reply_keyboard = [['Continuar', 'Volver', 'Cancelar', 'Anterior']]
+    reply_keyboard = [['Continuar', 'Volver'],['Cancelar', 'Anterior']]
     global selecion4
     global presupuesto
     selecion4 = update.message.text
@@ -185,9 +186,6 @@ def photo(update, context):
     return LOCATION
 
 
-
-
-
 def location(update, context):
     global detected_address
     user = update.message.from_user
@@ -201,34 +199,42 @@ def location(update, context):
     response = requests.get(url).json()
     logger.info(response)
     logger.info(response["results"][0]["formatted_address"])
-    detected_address = response["results"][0]["address_components"][1]["long_name"] + ", " + \
-                       response["results"][0]["address_components"][6]["long_name"] + ", " + \
-                       response["results"][0]["address_components"][2]["long_name"] + ", " + \
-                       response["results"][0]["address_components"][3]["long_name"] + ", " + \
-                       response["results"][0]["address_components"][4]["long_name"] + ", " + \
-                       response["results"][0]["address_components"][5]["long_name"]
+    detected_address = response["results"][0]["formatted_address"]
+    update.message.reply_text("Hemos detectado la ubicacion seguiente: ")
     update.message.reply_text(str(detected_address))
+    update.message.reply_text("Ahora agrega mas informacion como el numero de piso. Para saltar este paso introduce /skip")
 
-    update.message.reply_text('Presupuesto enviado por correo. \n'
-                              'Para pagar introduzca la tarjeta bancaria en formato: [numero],[mes],[año],[cvc]. \n'
-                              'Por ejemplo: 4242424242424242,6,2021,314')
+    return LOCATIONMANUAL
+# location, location manual, skip locationman, skip location, 22-23, func declaration, global
+def location_manual(update, context):
+    global detected_address_extra
+    detected_address_extra = update.message.text
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos. Para saltar ese puse introduce /skip")
+    return FECHA
 
+def skip_location_manual(update, context):
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos. Para saltar ese puse introduce /skip")
+    return FECHA
+
+def skip_location(update, context):
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos. Para saltar ese puse introduce /skip")
+    return FECHA
+
+def fecha(update, context):
+    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314')
     return PAGAR
 
+def skip_fecha(update, context):
+    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314')
+    return PAGAR
+
+
+
 def introloc(update, context):
-    
     update.message.reply_text('Introduzca su ubicación')
 
     return LOCATION
-  
-def skip_location(update, context):
-    user = update.message.from_user
-    logger.info("User %s did not send a location.", user.first_name)
-    update.message.reply_text('Presupuesto enviado por correo. \n'
-                              'Para pagar introduzca la tarjeta bancaria en formato: [numero],[mes],[año],[cvc]. \n'
-                              'Por ejemplo: 4242424242424242,6,2021,314')
 
-    return PAGAR
 
 
 def bio(update, context):
@@ -303,15 +309,14 @@ def enviarCorreo(receiver_email):
     # Add header as key/value pair to attachment part
     part.add_header(
         "Content-Disposition",
-        f"attachment; filename= {filename}",
+        "attachment; filename= {filename}",
     )
 
     # Add attachment to message and convert message to string
     message.attach(part)
 
     # Create a secure SSL context
-    #context = ssl.create_default_context()
-    ssl.create_default_context()
+    context = ssl.create_default_context()
     server = smtplib.SMTP_SSL(smtp_server)
     server.login(sender_email, password)
     server.sendmail(sender_email, receiver_email, message.as_string())
@@ -334,7 +339,7 @@ def pagar(update, context):
     stripe.api_key = "sk_test_51GtXF4Cpb85sHqrBKXCKSmG1BWAPeHiZLEsx9cPIpbjFF2YmhaJgeT5Ynt71pQPG6MvkTcLFSFcsFMH755pqhXkK00eRFJVb17"
     global presupuesto
     charge = stripe.Charge.create(
-        amount=int(presupuesto*100),
+        amount=int(presupuesto * 100),
         currency="eur",
         description="My First Test Charge (created for API docs)",
         source=stripe.Token.create(
@@ -346,13 +351,13 @@ def pagar(update, context):
             },
         ),
     )
-    bio(update,context)
+    bio(update, context)
 
 
 def skip_pagar(update, context):
     user = update.message.from_user
     update.message.reply_text("skip pagar")
-    bio(update,context)
+    bio(update, context)
 
 
 def error(update, context):
@@ -366,6 +371,7 @@ def main():
     # Post version 12 this will no longer be necessary
     updater = Updater("1197852167:AAETya5xtPT06hjp8VJQxbZQuL5M7Fk8h8k", use_context=True)
 
+    
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
@@ -395,17 +401,22 @@ def main():
 
             OCIOYVIAJE: [MessageHandler(Filters.regex('^(Ocio y viajes)$'), start)],
 
-            SELECTOR:[  CommandHandler('cancel', cancel),MessageHandler(Filters.regex('^(Reparaciones)$'), reparaciones)],
+            SELECTOR: [CommandHandler('cancel', cancel),
+                       MessageHandler(Filters.regex('^(Reparaciones)$'), reparaciones)],
 
-
-             PHOTO: [MessageHandler(Filters.photo, photo),
+            PHOTO: [MessageHandler(Filters.photo, photo),
                     CommandHandler('skip', introloc)],
-
 
             LOCATION: [MessageHandler(Filters.location, location),
                        CommandHandler('skip', skip_location)],
 
-            BIO: [MessageHandler(Filters.regex('^(Volver)$'), bio)],
+            LOCATIONMANUAL: [MessageHandler(Filters.text, location_manual),
+                             CommandHandler('skip', skip_location_manual)],
+
+            FECHA: [MessageHandler(Filters.text, fecha),
+                    CommandHandler('skip', skip_fecha)],
+
+            BIO: [MessageHandler(Filters.text, bio)],
 
             VOLVER: [MessageHandler(Filters.regex('^(Volver)$'), start)],
 
@@ -422,9 +433,9 @@ def main():
 
             CONTINUAR: [
                 MessageHandler(Filters.regex('^(Continuar)$'), informacion),
-            MessageHandler(Filters.regex('^(Back)$'),subsubrepaciones),
-            MessageHandler(Filters.regex('^(Cancelar)$'),cancel),
-            MessageHandler(Filters.regex('^(Volver)$'),start)]
+                MessageHandler(Filters.regex('^(Back)$'), subsubrepaciones),
+                MessageHandler(Filters.regex('^(Cancelar)$'), cancel),
+                MessageHandler(Filters.regex('^(Volver)$'), start)]
             ,
 
             PAGAR: [MessageHandler(Filters.text, pagar),
