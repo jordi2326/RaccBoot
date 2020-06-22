@@ -209,15 +209,15 @@ def location(update, context):
 def location_manual(update, context):
     global detected_address_extra
     detected_address_extra = update.message.text
-    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos. Para saltar ese puse introduce /skip")
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar ese puse introduce /skip")
     return FECHA
 
 def skip_location_manual(update, context):
-    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos. Para saltar ese puse introduce /skip")
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar ese puse introduce /skip")
     return FECHA
 
 def skip_location(update, context):
-    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos. Para saltar ese puse introduce /skip")
+    update.message.reply_text("Introduce el dia cuando usted quiere que nos pasemos en formato dd/mm/aaaa. Para saltar ese puse introduce /skip")
     return FECHA
 
 def fecha(update, context):
