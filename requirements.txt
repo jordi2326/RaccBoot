@@ -1,5 +1,7 @@
 future>=0.16.0
-certifi
+certifi~=2020.4.5.1
 tornado>=5.1
-cryptography
+cryptography~=2.9.2
 decorator>=4.4.0
+
+setuptools~=40.8.0
