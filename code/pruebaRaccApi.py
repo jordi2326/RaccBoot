@@ -141,13 +141,7 @@ def subsubsubreparaciones(update, context):
         update.message.reply_text('Precio : 111,08 €')
         presupuesto = 111.08
 
-    update.message.reply_text('Para continuar introducir Continuar \n\n'
-                              'Para volver al menú Volver\n\n'
-                              'Para salir pulsa Cancel\n\n'
-                              'Para cambiar el numero de horas pulsa Back\n\n',
-                              reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-
-    return CONTINUAR
+    return informacion(update, context)
 
 
 def informacion(update, context):
@@ -164,7 +158,7 @@ def informacion2(update, context):
     import threading
     download_thread = threading.Thread(target=enviarCorreo, args=[receiver_email])
     download_thread.start()
-    update.message.reply_text('Introduzca número de teléfono')
+    update.message.reply_text('Presupuesto enviado por correo. Introduzca número de teléfono')
     return INFORMACION1
 
 
@@ -221,11 +215,11 @@ def skip_location(update, context):
     return FECHA
 
 def fecha(update, context):
-    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
+    update.message.reply_text('Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
     return PAGAR
 
 def skip_fecha(update, context):
-    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
+    update.message.reply_text('Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
     return PAGAR
 
 
@@ -334,31 +328,37 @@ def cancel(update, context):
 
 def pagar(update, context):
     # para testear: 4242424242424242,6,2021,314
+    if(update.message.text == "/skip"):  return skip_pagar(update, context)
     tarjeta_info = update.message.text.split(",")
     import stripe
     stripe.api_key = "sk_test_51GtXF4Cpb85sHqrBKXCKSmG1BWAPeHiZLEsx9cPIpbjFF2YmhaJgeT5Ynt71pQPG6MvkTcLFSFcsFMH755pqhXkK00eRFJVb17"
     global presupuesto
-    charge = stripe.Charge.create(
-        amount=int(presupuesto * 100),
-        currency="eur",
-        description="My First Test Charge (created for API docs)",
-        source=stripe.Token.create(
-            card={
-                "number": tarjeta_info[0],
-                "exp_month": int(tarjeta_info[1]),
-                "exp_year": int(tarjeta_info[2]),
-                "cvc": tarjeta_info[3],
-            },
-        ),
-    )
-    return BIO
+    try:
+        charge = stripe.Charge.create(
+            amount=int(presupuesto * 100),
+            currency="eur",
+            description="My First Test Charge (created for API docs)",
+            source=stripe.Token.create(
+                card={
+                    "number": tarjeta_info[0],
+                    "exp_month": int(tarjeta_info[1]),
+                    "exp_year": int(tarjeta_info[2]),
+                    "cvc": tarjeta_info[3],
+                },
+            ),
+        )
+    except:
+        update.message.reply_text('Algún dato de su tarjeta es incorrecto. Por favor ingreselo nuevamente')
+        return PAGAR
+
+    return skip_pagar(update, context)
 
 
 def skip_pagar(update, context):
     user = update.message.from_user
-    update.message.reply_text("skip pagar")
-    return BIO
+    update.message.reply_text('¡Gracias! Espero poder hablar de nuevo con usted.')
 
+    return ConversationHandler.END
 
 def error(update, context):
     """Log Errors caused by Updates."""
@@ -431,15 +431,9 @@ def main():
             SUBSUBSUBREPARACIONES: [MessageHandler(Filters.regex('^(2 horas|3 horas|4 horas)$'), subsubsubreparaciones),
                                     CommandHandler('skip', start), CommandHandler('back', subreparaciones)],
 
-            CONTINUAR: [
-                MessageHandler(Filters.regex('^(Continuar)$'), informacion),
-                MessageHandler(Filters.regex('^(Back)$'), subsubrepaciones),
-                MessageHandler(Filters.regex('^(Cancelar)$'), cancel),
-                MessageHandler(Filters.regex('^(Volver)$'), start)]
-            ,
 
             PAGAR: [MessageHandler(Filters.text, pagar),
-                    CommandHandler('skip', skip_pagar)],
+                    CommandHandler('skip', bio)],
 
             INFORMACION: [MessageHandler(Filters.text, informacion2),
                           CommandHandler('skip', start)],
