@@ -141,13 +141,7 @@ def subsubsubreparaciones(update, context):
         update.message.reply_text('Precio : 111,08 €')
         presupuesto = 111.08
 
-    update.message.reply_text('Para continuar introducir Continuar \n\n'
-                              'Para volver al menú Volver\n\n'
-                              'Para salir pulsa Cancel\n\n'
-                              'Para cambiar el numero de horas pulsa Back\n\n',
-                              reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
-
-    return CONTINUAR
+    return informacion(update, context)
 
 
 def informacion(update, context):
@@ -432,12 +426,6 @@ def main():
             SUBSUBSUBREPARACIONES: [MessageHandler(Filters.regex('^(2 horas|3 horas|4 horas)$'), subsubsubreparaciones),
                                     CommandHandler('skip', start), CommandHandler('back', subreparaciones)],
 
-            CONTINUAR: [
-                MessageHandler(Filters.regex('^(Continuar)$'), informacion),
-                MessageHandler(Filters.regex('^(Back)$'), subsubrepaciones),
-                MessageHandler(Filters.regex('^(Cancelar)$'), cancel),
-                MessageHandler(Filters.regex('^(Volver)$'), start)]
-            ,
 
             PAGAR: [MessageHandler(Filters.text, pagar),
                     CommandHandler('skip', bio)],
