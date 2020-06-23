@@ -164,7 +164,7 @@ def informacion2(update, context):
     import threading
     download_thread = threading.Thread(target=enviarCorreo, args=[receiver_email])
     download_thread.start()
-    update.message.reply_text('Introduzca número de teléfono')
+    update.message.reply_text('Presupuesto enviado por correo. Introduzca número de teléfono')
     return INFORMACION1
 
 
@@ -221,11 +221,11 @@ def skip_location(update, context):
     return FECHA
 
 def fecha(update, context):
-    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
+    update.message.reply_text('Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
     return PAGAR
 
 def skip_fecha(update, context):
-    update.message.reply_text('Presupuesto enviado por correo. Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
+    update.message.reply_text('Para pagar introduzca la tarjeta bancaria en formato [numero],[mes],[anyo],[cvc]. Por ejemplo 4242424242424242,6,2021,314\nO introduzca /skip para omitir y pagar en efectivo')
     return PAGAR
 
 
@@ -309,7 +309,7 @@ def enviarCorreo(receiver_email):
     # Add header as key/value pair to attachment part
     part.add_header(
         "Content-Disposition",
-        f"attachment; filename= {filename}",
+        "attachment; filename= {filename}",
     )
 
     # Add attachment to message and convert message to string
@@ -334,6 +334,7 @@ def cancel(update, context):
 
 def pagar(update, context):
     # para testear: 4242424242424242,6,2021,314
+    if(update.message.text == "/skip"):  return skip_pagar(update, context)
     tarjeta_info = update.message.text.split(",")
     import stripe
     stripe.api_key = "sk_test_51GtXF4Cpb85sHqrBKXCKSmG1BWAPeHiZLEsx9cPIpbjFF2YmhaJgeT5Ynt71pQPG6MvkTcLFSFcsFMH755pqhXkK00eRFJVb17"
@@ -351,14 +352,14 @@ def pagar(update, context):
             },
         ),
     )
-    return BIO
+    return skip_pagar(update, context)
 
 
 def skip_pagar(update, context):
     user = update.message.from_user
-    update.message.reply_text("skip pagar")
-    return BIO
+    update.message.reply_text('¡Gracias! Espero poder hablar de nuevo con usted.')
 
+    return ConversationHandler.END
 
 def error(update, context):
     """Log Errors caused by Updates."""
@@ -439,7 +440,7 @@ def main():
             ,
 
             PAGAR: [MessageHandler(Filters.text, pagar),
-                    CommandHandler('skip', skip_pagar)],
+                    CommandHandler('skip', bio)],
 
             INFORMACION: [MessageHandler(Filters.text, informacion2),
                           CommandHandler('skip', start)],
