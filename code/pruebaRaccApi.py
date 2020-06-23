@@ -6,6 +6,7 @@
 First, a few callback functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
+
 Usage:
 Example of a bot-user conversation using ConversationHandler.
 Send /start to initiate the conversation.
@@ -261,6 +262,7 @@ def enviarCorreo(receiver_email):
     Hola,
     Adjuntamos el presupuesto de los servicios que ha solicitado.
     Muchas gracias por su confianza.
+
     Atentamente,
     RACC"""
     html = """\
@@ -331,19 +333,24 @@ def pagar(update, context):
     import stripe
     stripe.api_key = "sk_test_51GtXF4Cpb85sHqrBKXCKSmG1BWAPeHiZLEsx9cPIpbjFF2YmhaJgeT5Ynt71pQPG6MvkTcLFSFcsFMH755pqhXkK00eRFJVb17"
     global presupuesto
-    charge = stripe.Charge.create(
-        amount=int(presupuesto * 100),
-        currency="eur",
-        description="My First Test Charge (created for API docs)",
-        source=stripe.Token.create(
-            card={
-                "number": tarjeta_info[0],
-                "exp_month": int(tarjeta_info[1]),
-                "exp_year": int(tarjeta_info[2]),
-                "cvc": tarjeta_info[3],
-            },
-        ),
-    )
+    try:
+        charge = stripe.Charge.create(
+            amount=int(presupuesto * 100),
+            currency="eur",
+            description="My First Test Charge (created for API docs)",
+            source=stripe.Token.create(
+                card={
+                    "number": tarjeta_info[0],
+                    "exp_month": int(tarjeta_info[1]),
+                    "exp_year": int(tarjeta_info[2]),
+                    "cvc": tarjeta_info[3],
+                },
+            ),
+        )
+    except:
+        update.message.reply_text('Algún dato de su tarjeta es incorrecto. Por favor ingreselo nuevamente')
+        return PAGAR
+
     return skip_pagar(update, context)
 
 
